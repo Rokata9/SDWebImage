@@ -6,6 +6,7 @@
     self = [super init];
     if (self) {
         self.indicatorView = [[UIView alloc] init];
+		self.indicatorView.hidden = YES;
     }
     return self;
 }
