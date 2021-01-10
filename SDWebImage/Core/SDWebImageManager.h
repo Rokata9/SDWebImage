@@ -218,7 +218,7 @@ SDWebImageManager *manager = [SDWebImageManager sharedManager];
  * @param completedBlock A block called when operation has been completed.
  *
  *   This parameter is required.
- * 
+ *
  *   This block has no return value and takes the requested UIImage as first parameter and the NSData representation as second parameter.
  *   In case of error the image parameter is nil and the third parameter may contain an NSError.
  *
@@ -254,7 +254,8 @@ SDWebImageManager *manager = [SDWebImageManager sharedManager];
                                                    options:(SDWebImageOptions)options
                                                    context:(nullable SDWebImageContext *)context
                                                   progress:(nullable SDImageLoaderProgressBlock)progressBlock
-                                                 completed:(nonnull SDInternalCompletionBlock)completedBlock;
+                                                 completed:(nonnull SDInternalCompletionBlock)completedBlock
+                                                onResolveCache:(nullable void(^)(void))onResolveCache;
 
 /**
  * Cancel all current operations

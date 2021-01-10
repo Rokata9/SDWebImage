@@ -83,11 +83,11 @@
 
 #pragma mark - SDImageCache
 
-- (id<SDWebImageOperation>)queryImageForKey:(NSString *)key options:(SDWebImageOptions)options context:(SDWebImageContext *)context completion:(SDImageCacheQueryCompletionBlock)completionBlock {
-    return [self queryImageForKey:key options:options context:context cacheType:SDImageCacheTypeAll completion:completionBlock];
+- (id<SDWebImageOperation>)queryImageForKey:(NSString *)key options:(SDWebImageOptions)options context:(SDWebImageContext *)context completion:(SDImageCacheQueryCompletionBlock)completionBlock onResolveCache:(nullable void (^)(void))onResolveCache {
+    return [self queryImageForKey:key options:options context:context cacheType:SDImageCacheTypeAll completion:completionBlock onResolveCache:nil];
 }
 
-- (id<SDWebImageOperation>)queryImageForKey:(NSString *)key options:(SDWebImageOptions)options context:(SDWebImageContext *)context cacheType:(SDImageCacheType)cacheType completion:(SDImageCacheQueryCompletionBlock)completionBlock {
+- (id<SDWebImageOperation>)queryImageForKey:(NSString *)key options:(SDWebImageOptions)options context:(SDWebImageContext *)context cacheType:(SDImageCacheType)cacheType completion:(SDImageCacheQueryCompletionBlock)completionBlock onResolveCache:(nullable void (^)(void))onResolveCache {
     if (!key) {
         return nil;
     }
@@ -96,17 +96,17 @@
     if (count == 0) {
         return nil;
     } else if (count == 1) {
-        return [caches.firstObject queryImageForKey:key options:options context:context cacheType:cacheType completion:completionBlock];
+        return [caches.firstObject queryImageForKey:key options:options context:context cacheType:cacheType completion:completionBlock onResolveCache:nil];
     }
     switch (self.queryOperationPolicy) {
         case SDImageCachesManagerOperationPolicyHighestOnly: {
             id<SDImageCache> cache = caches.lastObject;
-            return [cache queryImageForKey:key options:options context:context cacheType:cacheType completion:completionBlock];
+            return [cache queryImageForKey:key options:options context:context cacheType:cacheType completion:completionBlock onResolveCache:nil];
         }
             break;
         case SDImageCachesManagerOperationPolicyLowestOnly: {
             id<SDImageCache> cache = caches.firstObject;
-            return [cache queryImageForKey:key options:options context:context cacheType:cacheType completion:completionBlock];
+            return [cache queryImageForKey:key options:options context:context cacheType:cacheType completion:completionBlock onResolveCache:nil];
         }
             break;
         case SDImageCachesManagerOperationPolicyConcurrent: {
@@ -311,7 +311,7 @@
                     completionBlock(nil, nil, SDImageCacheTypeNone);
                 }
             }
-        }];
+        } onResolveCache:nil];
     }
 }
 
@@ -459,7 +459,7 @@
         }
         // Next
         [self serialQueryImageForKey:key options:options context:context cacheType:queryCacheType completion:completionBlock enumerator:enumerator operation:operation];
-    }];
+    } onResolveCache:nil];
 }
 
 - (void)serialStoreImage:(UIImage *)image imageData:(NSData *)imageData forKey:(NSString *)key cacheType:(SDImageCacheType)cacheType completion:(SDWebImageNoParamsBlock)completionBlock enumerator:(NSEnumerator<id<SDImageCache>> *)enumerator {

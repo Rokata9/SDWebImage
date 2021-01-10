@@ -87,7 +87,8 @@ const int64_t SDWebImageProgressUnitCountUnknown = 1LL;
         
 #if SD_UIKIT || SD_MAC
         // check and start image indicator
-        [self sd_startImageIndicator];
+        //[self sd_startImageIndicator];
+        
         id<SDWebImageIndicator> imageIndicator = self.sd_imageIndicator;
 #endif
         SDWebImageManager *manager = context[SDWebImageContextCustomManager];
@@ -99,6 +100,12 @@ const int64_t SDWebImageProgressUnitCountUnknown = 1LL;
             mutableContext[SDWebImageContextCustomManager] = nil;
             context = [mutableContext copy];
         }
+
+        void (^showIndicatorCallback) (void) = ^() {
+            #if SD_UIKIT || SD_MAC
+            [self sd_startImageIndicator];
+            #endif
+        };
         
         SDImageLoaderProgressBlock combinedProgressBlock = ^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
             if (imageProgress) {
@@ -208,7 +215,7 @@ const int64_t SDWebImageProgressUnitCountUnknown = 1LL;
 #endif
                 callCompletedBlockClojure();
             });
-        }];
+        } onResolveCache: showIndicatorCallback];
         [self sd_setImageLoadOperation:operation forKey:validOperationKey];
     } else {
 #if SD_UIKIT || SD_MAC

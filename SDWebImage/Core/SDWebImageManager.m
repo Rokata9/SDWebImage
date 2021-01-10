@@ -162,14 +162,15 @@ static id<SDImageLoader> _defaultImageLoader;
 }
 
 - (SDWebImageCombinedOperation *)loadImageWithURL:(NSURL *)url options:(SDWebImageOptions)options progress:(SDImageLoaderProgressBlock)progressBlock completed:(SDInternalCompletionBlock)completedBlock {
-    return [self loadImageWithURL:url options:options context:nil progress:progressBlock completed:completedBlock];
+    return [self loadImageWithURL:url options:options context:nil progress:progressBlock completed:completedBlock onResolveCache:nil];
 }
 
 - (SDWebImageCombinedOperation *)loadImageWithURL:(nullable NSURL *)url
                                           options:(SDWebImageOptions)options
                                           context:(nullable SDWebImageContext *)context
                                          progress:(nullable SDImageLoaderProgressBlock)progressBlock
-                                        completed:(nonnull SDInternalCompletionBlock)completedBlock {
+                                        completed:(nonnull SDInternalCompletionBlock)completedBlock
+                                   onResolveCache:(nullable void(^)(void))onResolveCache {
     // Invoking this method without a completedBlock is pointless
     NSAssert(completedBlock != nil, @"If you mean to prefetch the image, use -[SDWebImagePrefetcher prefetchURLs] instead");
 
@@ -209,7 +210,7 @@ static id<SDImageLoader> _defaultImageLoader;
     SDWebImageOptionsResult *result = [self processedResultForURL:url options:options context:context];
     
     // Start the entry to load image from cache
-    [self callCacheProcessForOperation:operation url:url options:result.options context:result.context progress:progressBlock completed:completedBlock];
+    [self callCacheProcessForOperation:operation url:url options:result.options context:result.context progress:progressBlock completed:completedBlock onResolveCache:onResolveCache];
 
     return operation;
 }
@@ -252,7 +253,8 @@ static id<SDImageLoader> _defaultImageLoader;
                              options:(SDWebImageOptions)options
                              context:(nullable SDWebImageContext *)context
                             progress:(nullable SDImageLoaderProgressBlock)progressBlock
-                           completed:(nullable SDInternalCompletionBlock)completedBlock {
+                           completed:(nullable SDInternalCompletionBlock)completedBlock
+                           onResolveCache:(nullable void(^)(void))onResolveCache {
     // Grab the image cache to use
     id<SDImageCache> imageCache;
     if ([context[SDWebImageContextImageCache] conformsToProtocol:@protocol(SDImageCache)]) {
@@ -287,7 +289,7 @@ static id<SDImageLoader> _defaultImageLoader;
             
             // Continue download process
             [self callDownloadProcessForOperation:operation url:url options:options context:context cachedImage:cachedImage cachedData:cachedData cacheType:cacheType progress:progressBlock completed:completedBlock];
-        }];
+        } onResolveCache:onResolveCache];
     } else {
         // Continue download process
         [self callDownloadProcessForOperation:operation url:url options:options context:context cachedImage:nil cachedData:nil cacheType:SDImageCacheTypeNone progress:progressBlock completed:completedBlock];
@@ -317,6 +319,7 @@ static id<SDImageLoader> _defaultImageLoader;
     
     // Check whether we should query original cache
     BOOL shouldQueryOriginalCache = (originalQueryCacheType != SDImageCacheTypeNone);
+    
     if (shouldQueryOriginalCache) {
         // Change originContext to mutable
         SDWebImageMutableContext * __block originContext;
@@ -350,7 +353,7 @@ static id<SDImageLoader> _defaultImageLoader;
             [self callStoreCacheProcessForOperation:operation url:url options:options context:context downloadedImage:cachedImage downloadedData:cachedData finished:YES progress:progressBlock completed:completedBlock];
             
             [self safelyRemoveOperationFromRunning:operation];
-        }];
+        } onResolveCache:nil];
     } else {
         // Continue download process
         [self callDownloadProcessForOperation:operation url:url options:options context:context cachedImage:nil cachedData:nil cacheType:originalQueryCacheType progress:progressBlock completed:completedBlock];

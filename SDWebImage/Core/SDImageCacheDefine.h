@@ -75,7 +75,8 @@ FOUNDATION_EXPORT UIImage * _Nullable SDImageCacheDecodeImageData(NSData * _Nonn
 - (nullable id<SDWebImageOperation>)queryImageForKey:(nullable NSString *)key
                                              options:(SDWebImageOptions)options
                                              context:(nullable SDWebImageContext *)context
-                                          completion:(nullable SDImageCacheQueryCompletionBlock)completionBlock;
+                                          completion:(nullable SDImageCacheQueryCompletionBlock)completionBlock
+                                        onResolveCache:(nullable void (^)(void))onResolveCache;
 
 /**
  Query the cached image from image cache for given key. The operation can be used to cancel the query.
@@ -92,7 +93,8 @@ FOUNDATION_EXPORT UIImage * _Nullable SDImageCacheDecodeImageData(NSData * _Nonn
                                              options:(SDWebImageOptions)options
                                              context:(nullable SDWebImageContext *)context
                                            cacheType:(SDImageCacheType)cacheType
-                                          completion:(nullable SDImageCacheQueryCompletionBlock)completionBlock;
+                                          completion:(nullable SDImageCacheQueryCompletionBlock)completionBlock
+                                        onResolveCache:(nullable void (^)(void))onResolveCache;
 
 /**
  Store the image into image cache for the given key. If cache type is memory only, completion is called synchronously, else asynchronously.

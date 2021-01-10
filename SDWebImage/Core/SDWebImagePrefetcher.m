@@ -143,7 +143,7 @@
                         }
                     }
                     [asyncOperation complete];
-                }];
+                } onResolveCache:nil];
                 NSAssert(operation != nil, @"Operation should not be nil, [SDWebImageManager loadImageWithURL:options:context:progress:completed:] break prefetch logic");
                 SD_LOCK(token->_loadOperationsLock);
                 [token.loadOperations addPointer:(__bridge void *)operation];

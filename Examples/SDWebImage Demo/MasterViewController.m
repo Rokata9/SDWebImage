@@ -9,6 +9,7 @@
 #import "MasterViewController.h"
 #import "DetailViewController.h"
 #import <SDWebImage/SDWebImage.h>
+#import "CustomIndicator.h"
 
 @interface MyCustomTableViewCell : UITableViewCell
 
@@ -106,7 +107,7 @@
     if (cell == nil) {
         cell = [[MyCustomTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
         cell.customImageView.sd_imageTransition = SDWebImageTransition.fadeTransition;
-        cell.customImageView.sd_imageIndicator = SDWebImageActivityIndicator.grayIndicator;
+        cell.customImageView.sd_imageIndicator = [CustomIndicator new];
     }
     
     cell.customTextLabel.text = [NSString stringWithFormat:@"Image #%ld", (long)indexPath.row];
@@ -122,7 +123,7 @@
         if (@available(iOS 10.0, *)) {
             NSURLSessionTaskMetrics *metrics = token.metrics;
             if (metrics) {
-                printf("Metrics: %s download in (%f) seconds\n", [imageURL.absoluteString cStringUsingEncoding:NSUTF8StringEncoding], metrics.taskInterval.duration);
+                //printf("Metrics: %s download in (%f) seconds\n", [imageURL.absoluteString cStringUsingEncoding:NSUTF8StringEncoding], metrics.taskInterval.duration);
             }
         }
     }];
